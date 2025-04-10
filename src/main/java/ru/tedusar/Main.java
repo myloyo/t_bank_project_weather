@@ -35,6 +35,7 @@ public class Main {
         cities.put("Балаково", 0);
         cities.put("Балашов", 0);
         cities.put("Норильск", 0);
+        cities.put("Ростов", 0);
 
         Random random = new Random(); // заполняю по ключам значения
         for (String city : cities.keySet()) {
