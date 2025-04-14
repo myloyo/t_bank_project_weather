@@ -1,7 +1,6 @@
 package ru.tedusar;
 
 import java.util.*;
-
 import static ru.tedusar.CitiesRepository.*;
 import static ru.tedusar.HistoryService.*;
 
@@ -12,12 +11,15 @@ public class Main {
 
         Scanner in = new Scanner(System.in);
         System.out.print("Введите город: ");
-        String city = in.next();
+        String city = in.nextLine().trim();
         data.add(city); // добавляем новый город в память
 
         try {
             if (city.matches(".*[A-Za-z].*")) {
                 throw new UncorrectNaming("Латинские буквы в названии: " + city);
+            }
+            if (city.isEmpty()){
+                throw new BlankLineError("Введено пустое значение");
             }
             if (!cities.containsKey(city)) {
                 throw new UncorrectTown("Некорректное название города: " + city);
