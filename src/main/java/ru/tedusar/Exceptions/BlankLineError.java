@@ -1,4 +1,4 @@
-package ru.tedusar;
+package ru.tedusar.Exceptions;
 
 public class BlankLineError extends RuntimeException {
     public BlankLineError(String message) {
