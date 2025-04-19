@@ -46,7 +46,7 @@ public class Main {
                     System.out.println("история успешно очищена");
                 }
             }
-        } catch (UncorrectTown | UncorrectNaming | BlankLineError e) {
+        } catch (UncorrectTown | UncorrectNaming | BlankLineError | InvalidSymbols e) {
             System.out.println(e.getMessage());
         } finally {
             writeHistoryToFile(data); // сохраняем обратно в файл
