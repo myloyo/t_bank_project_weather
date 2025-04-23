@@ -1,4 +1,4 @@
-package ru.tedusar;
+package ru.tedusar.classes;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,9 +22,12 @@ public class WeatherClass {
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " UTC";
     }
 
+    @Override
     public String toString() {
         return String.format(
-                "температура: %d°C\nскорость ветра: %d м/с\nнаправление ветра: %s\nдавление: %d мм рт. ст.\nвлажность: %d%%\nуф-индекс: %d\nдата/время прогноза: %s",
-                temperature, windSpeed, windDirection, pressure, humidity, uvIndex, timestamp);
+                "температура: %d°C; скорость ветра: %d м/с; направление ветра: %s; давление: %d мм рт. ст.; влажность: %d%%; уф-индекс: %d; дата/время прогноза: %s",
+                temperature, windSpeed, windDirection, pressure, humidity, uvIndex, timestamp
+        );
     }
+
 }

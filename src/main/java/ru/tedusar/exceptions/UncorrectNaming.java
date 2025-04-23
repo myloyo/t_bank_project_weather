@@ -1,4 +1,4 @@
-package ru.tedusar.Exceptions;
+package ru.tedusar.exceptions;
 
 public class UncorrectNaming extends Exception {
     public UncorrectNaming(String message) {
