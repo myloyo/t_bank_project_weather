@@ -3,6 +3,7 @@ package ru.tedusar.services;
 import ru.tedusar.classes.HistoryClass;
 import ru.tedusar.repositories.HistoryRepository;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class HistoryService {
@@ -12,19 +13,33 @@ public class HistoryService {
         this.repository = repository;
     }
 
-    public HistoryService(String fileName) {
-        this.repository = new HistoryRepository(fileName);
+    public void saveRequest(int forecastId, int userId) {
+        try {
+            HistoryClass historyEntry = new HistoryClass(forecastId, userId);
+            repository.save(historyEntry);
+        } catch (SQLException e) {
+            throw new RuntimeException("Не удалось сохранить историю запроса", e);
+        }
     }
 
-    public List<HistoryClass> loadHistory() {
-        return repository.readHistory();
+    public List<HistoryClass> getUserHistory(int userId) {
+        try {
+            return repository.findByUserId(userId);
+        } catch (SQLException e) {
+            throw new RuntimeException("Не удалось загрузить историю запросов", e);
+        }
     }
 
-    public void saveHistory(List<HistoryClass> history) {
-        repository.writeHistory(history);
+    public void clearUserHistory(int userId) {
+        try {
+            repository.deleteByUserId(userId);
+        } catch (SQLException e) {
+            throw new RuntimeException("Не удалось очистить историю запросов", e);
+        }
     }
 
-    public void clear() {
-        repository.clearHistory();
+    public HistoryClass getLastUserRequest(int userId) {
+        List<HistoryClass> history = getUserHistory(userId);
+        return history.isEmpty() ? null : history.get(0);
     }
 }

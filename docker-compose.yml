@@ -1,0 +1,10 @@
+services:
+
+  local-storage:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'weather_db'
+    ports:
+      - '5433:5432'
