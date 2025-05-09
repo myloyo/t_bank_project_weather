@@ -1,7 +1,7 @@
 package ru.tedusar.services;
 
 import java.sql.*;
-import ru.tedusar.classes.UserClass;
+import ru.tedusar.entity.UserClass;
 import ru.tedusar.repositories.UserRepository;
 
 public class UserService {

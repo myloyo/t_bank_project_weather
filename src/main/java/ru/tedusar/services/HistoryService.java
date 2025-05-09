@@ -1,6 +1,6 @@
 package ru.tedusar.services;
 
-import ru.tedusar.classes.HistoryClass;
+import ru.tedusar.entity.HistoryClass;
 import ru.tedusar.repositories.HistoryRepository;
 
 import java.sql.SQLException;

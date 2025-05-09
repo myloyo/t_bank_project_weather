@@ -1,6 +1,6 @@
 package ru.tedusar;
 
-import ru.tedusar.classes.*;
+import ru.tedusar.entity.*;
 import ru.tedusar.exceptions.*;
 import ru.tedusar.repositories.*;
 import ru.tedusar.services.*;
@@ -11,6 +11,9 @@ import java.util.*;
 
 
 public class Main {
+    private static final String LATIN_LETTERS_PATTERN = ".*[A-Za-z].*";
+    private static final String DIGITS_OR_INVALID_CHARS_PATTERN = ".*\\d.*|.*[^а-яА-Я\\s\\-].*";
+
     public static void main(String[] args) {
         try {
             DBInitialize.initialize();
@@ -46,7 +49,7 @@ public class Main {
                 System.out.println("\nИстория запросов:");
                 List<HistoryClass> history = historyService.getUserHistory(1);
                 for (HistoryClass entry : history) {
-                    WeatherClass histWeather = weatherRepo.findById(entry.getId_forecast());
+                    WeatherClass histWeather = weatherRepo.findById(entry.getIdForecast());
                     CityClass histCity = citiesRepo.findById(histWeather.getCityId());
                     System.out.println("Город: " + histCity.getName());
                     System.out.println(histWeather);
@@ -76,10 +79,10 @@ public class Main {
         if (city.isEmpty()) {
             throw new BlankLineError("Введено пустое значение");
         }
-        if (city.matches(".*[A-Za-z].*")) {
+        if (city.matches(LATIN_LETTERS_PATTERN)) {
             throw new UncorrectNaming("Латинские буквы в названии: " + city);
         }
-        if (city.matches(".*\\d.*") || city.matches(".*[^а-яА-Я\\s\\-].*")) {
+        if (city.matches(DIGITS_OR_INVALID_CHARS_PATTERN)) {
             throw new InvalidSymbols("Название содержит недопустимые символы: " + city);
         }
     }

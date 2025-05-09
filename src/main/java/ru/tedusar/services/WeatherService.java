@@ -1,13 +1,12 @@
 package ru.tedusar.services;
 
 
-import ru.tedusar.classes.*;
+import ru.tedusar.entity.*;
 import ru.tedusar.repositories.CitiesRepository;
 import ru.tedusar.repositories.WeatherRepository;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
 

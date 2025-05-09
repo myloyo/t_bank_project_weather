@@ -1,7 +1,7 @@
 package ru.tedusar.services;
 
-import ru.tedusar.classes.CityClass;
-import ru.tedusar.classes.WeatherClass;
+import ru.tedusar.entity.CityClass;
+import ru.tedusar.entity.WeatherClass;
 import ru.tedusar.repositories.CitiesRepository;
 import ru.tedusar.repositories.WeatherRepository;
 

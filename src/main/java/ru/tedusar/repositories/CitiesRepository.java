@@ -1,19 +1,24 @@
 package ru.tedusar.repositories;
-import ru.tedusar.classes.CityClass;
+import ru.tedusar.entity.CityClass;
 import ru.tedusar.utils.DBConnector;
 
 import java.util.*;
 import java.sql.*;
 
 public class CitiesRepository {
+    private static final String FIND_ALL_SQL = "SELECT id_city, name_city FROM city";
+    private static final String FIND_BY_NAME_SQL = "SELECT id_city, name_city FROM city WHERE name_city = ?";
+    private static final String SAVE_SQL = "INSERT INTO city (name_city) VALUES (?)";
+    private static final String DELETE_SQL = "DELETE FROM city WHERE id_city = ?";
+    private static final String UPDATE_SQL = "UPDATE city SET name_city = ? WHERE id_city = ?";
+    private static final String FIND_BY_ID_SQL = "SELECT * FROM city WHERE id_city = ?";
 
     public List<CityClass> findAll() throws SQLException {
         List<CityClass> cities = new ArrayList<>();
-        String sql = "SELECT id_city, name_city FROM city";
 
         try (Connection connection = DBConnector.getConnection();
              Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             ResultSet rs = stmt.executeQuery(FIND_ALL_SQL)) {
 
             while (rs.next()) {
                 cities.add(new CityClass(
@@ -26,10 +31,8 @@ public class CitiesRepository {
     }
 
     public CityClass findByName(String name) throws SQLException {
-        String sql = "SELECT id_city, name_city FROM city WHERE name_city = ?";
-
         try (Connection connection = DBConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+             PreparedStatement stmt = connection.prepareStatement(FIND_BY_NAME_SQL)) {
 
             stmt.setString(1, name);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -45,10 +48,8 @@ public class CitiesRepository {
     }
 
     public void save(CityClass city) throws SQLException {
-        String sql = "INSERT INTO city (name_city) VALUES (?)";
-
         try (Connection connection = DBConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, city.getName());
             stmt.executeUpdate();
@@ -62,46 +63,27 @@ public class CitiesRepository {
     }
 
     public void delete(CityClass city) throws SQLException {
-        String sql = "DELETE FROM city WHERE id_city = ?";
         try (Connection connection = DBConnector.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
+             PreparedStatement stmt = connection.prepareStatement(DELETE_SQL)) {
 
             stmt.setInt(1, city.getId());
             stmt.executeUpdate();
-
-            try(ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    city.setId(generatedKeys.getInt(1));
-                }
-            }
-
-
         }
     }
 
     public void update(CityClass city) throws SQLException {
-        String sql = "UPDATE city SET name_city = ? WHERE id_city = ?";
         try (Connection connection = DBConnector.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
+             PreparedStatement stmt = connection.prepareStatement(UPDATE_SQL)) {
 
             stmt.setString(1, city.getName());
             stmt.setInt(2, city.getId());
             stmt.executeUpdate();
-
-            try(ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    city.setId(generatedKeys.getInt(1));
-                }
-            }
-
         }
     }
 
     public CityClass findById(int cityId) throws SQLException {
-        String sql = "SELECT * FROM city WHERE id_city = ?";
-
         try (Connection conn = DBConnector.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(FIND_BY_ID_SQL)) {
 
             stmt.setInt(1, cityId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -115,6 +97,4 @@ public class CitiesRepository {
         }
         return null;
     }
-
-
 }

@@ -6,7 +6,6 @@ import java.sql.Statement;
 
 public class DBInitialize {
     public static void initialize() throws SQLException {
-        // Сначала попробуем создать таблицы напрямую
         String sql = "CREATE TABLE IF NOT EXISTS city (" +
                 "id_city SERIAL PRIMARY KEY," +
                 "name_city VARCHAR(100) NOT NULL UNIQUE" +
@@ -35,10 +34,9 @@ public class DBInitialize {
              Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
         } catch (SQLException e) {
-            // Если ошибка связана с отсутствием базы данных, создадим её
             if (e.getMessage().contains("database \"weather_db\" does not exist")) {
                 createDatabase();
-                initialize(); // Повторно инициализируем после создания БД
+                initialize();
             } else {
                 throw e;
             }

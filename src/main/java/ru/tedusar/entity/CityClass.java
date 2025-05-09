@@ -1,4 +1,4 @@
-package ru.tedusar.classes;
+package ru.tedusar.entity;
 
 public class CityClass {
     private Integer id;

@@ -1,6 +1,6 @@
 package ru.tedusar.repositories;
 
-import ru.tedusar.classes.HistoryClass;
+import ru.tedusar.entity.HistoryClass;
 import ru.tedusar.utils.DBConnector;
 
 import java.sql.*;
@@ -8,10 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryRepository {
+    private static final String FIND_ALL_SQL = "SELECT id_request, id_forecast, id_user, requestTime FROM history";
+    private static final String SAVE_SQL = "INSERT INTO history (id_forecast, id_user, requestTime) VALUES (?, ?, ?)";
+    private static final String DELETE_SQL = "DELETE FROM city WHERE id_city = ?";
+    private static final String FIND_BY_USER_ID_SQL = "SELECT id_request, id_forecast, id_user, requestTime FROM history WHERE id_user = ? ORDER BY requestTime DESC";
+    private static final String DELETE_BY_USER_ID_SQL = "DELETE FROM history WHERE id_user = ?";
+    private static final String FIND_BY_FORECAST_ID_SQL = "SELECT id_request, id_forecast, id_user, requestTime FROM history WHERE id_forecast = ?";
 
     public List<HistoryClass> findAll() throws SQLException {
         List<HistoryClass> history = new ArrayList<>();
-        String sql = "SELECT id_request, id_forecast, id_user, requestTime FROM history";
+        String sql = FIND_ALL_SQL;
 
         try (Connection connection = DBConnector.getConnection();
              Statement stmt = connection.createStatement();
@@ -30,20 +36,20 @@ public class HistoryRepository {
     }
 
     public void save(HistoryClass history) throws SQLException {
-        String sql = "INSERT INTO history (id_forecast, id_user, requestTime) VALUES (?, ?, ?)";
+        String sql = SAVE_SQL;
 
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setInt(1, history.getId_forecast());
-            stmt.setInt(2, history.getId_user());
+            stmt.setInt(1, history.getIdForecast());
+            stmt.setInt(2, history.getIdUser());
             stmt.setString(3, history.getRequestTime());
 
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
-                    history.setId_request(rs.getInt(1));
+                    history.setIdRequest(rs.getInt(1));
                 }
             }
         }
@@ -51,7 +57,7 @@ public class HistoryRepository {
 
     public List<HistoryClass> findByUserId(int userId) throws SQLException {
         List<HistoryClass> history = new ArrayList<>();
-        String sql = "SELECT id_request, id_forecast, id_user, requestTime FROM history WHERE id_user = ? ORDER BY requestTime DESC";
+        String sql = FIND_BY_USER_ID_SQL;
 
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -72,7 +78,7 @@ public class HistoryRepository {
     }
 
     public void deleteByUserId(int userId) throws SQLException {
-        String sql = "DELETE FROM history WHERE id_user = ?";
+        String sql = DELETE_BY_USER_ID_SQL;
 
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -84,7 +90,7 @@ public class HistoryRepository {
 
     public List<HistoryClass> findByForecastId(int forecastId) throws SQLException {
         List<HistoryClass> history = new ArrayList<>();
-        String sql = "SELECT id_request, id_forecast, id_user, requestTime FROM history WHERE id_forecast = ?";
+        String sql = FIND_BY_FORECAST_ID_SQL;
 
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

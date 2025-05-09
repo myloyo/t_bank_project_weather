@@ -20,7 +20,7 @@ public class DBConnector {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
-    // Правильное закрытие соединения
+
     public static void closeConnection(Connection connection) {
         if (connection != null) {
             try {
@@ -35,7 +35,7 @@ public class DBConnector {
 
     public static Connection getRootConnection() throws SQLException {
         return DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5433/postgres",
+                "jdbc:postgresql://localhost:5433/weather_db",
                 USER,
                 PASSWORD
         );

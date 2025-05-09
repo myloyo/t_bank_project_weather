@@ -1,11 +1,11 @@
-package ru.tedusar.classes;
+package ru.tedusar.entity;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class WeatherClass {
-    private Integer id_forecast;
-    private Integer id_city;
+    private Integer idForecast;
+    private Integer idCity;
     private final int temperature;
     private final int windSpeed;
     private final String windDirection;
@@ -17,8 +17,8 @@ public class WeatherClass {
     public WeatherClass(Integer id_city, int temperature, int windSpeed,
                         String windDirection, int pressure,
                         int humidity, int uvIndex, LocalDateTime timestamp) {
-        this.id_forecast = null;
-        this.id_city = id_city;
+        this.idForecast = null;
+        this.idCity = id_city;
         this.temperature = temperature;
         this.windSpeed = windSpeed;
         this.windDirection = windDirection;
@@ -29,8 +29,8 @@ public class WeatherClass {
     }
 
     public WeatherClass(int id_forecast, int id_city, int temperature, int windSpeed, String windDirection, int pressure, int humidity, int uvIndex, LocalDateTime timestamp) {
-        this.id_forecast = id_forecast;
-        this.id_city = id_city;
+        this.idForecast = id_forecast;
+        this.idCity = id_city;
         this.temperature = temperature;
         this.windSpeed = windSpeed;
         this.windDirection = windDirection;
@@ -40,8 +40,8 @@ public class WeatherClass {
         this.timestamp = timestamp;
     }
 
-    public Integer getIdForecast() { return id_forecast; }
-    public Integer getCityId() { return id_city; }
+    public Integer getIdForecast() { return idForecast; }
+    public Integer getCityId() { return idCity; }
     public int getTemperature() { return temperature; }
     public int getWindSpeed() { return windSpeed; }
     public String getWindDirection() { return windDirection; }
@@ -50,8 +50,8 @@ public class WeatherClass {
     public int getUvIndex() { return uvIndex; }
     public LocalDateTime getTimestamp() {return timestamp;}
 
-    public void setIdForecast(Integer id_forecast) { this.id_forecast = id_forecast; }
-    public void setCityId(Integer id_city) { this.id_city = id_city; }
+    public void setIdForecast(Integer id_forecast) { this.idForecast = id_forecast; }
+    public void setCityId(Integer id_city) { this.idCity = id_city; }
 
     @Override
     public String toString() {

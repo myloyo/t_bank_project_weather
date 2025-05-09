@@ -1,6 +1,6 @@
 package ru.tedusar.repositories;
 
-import ru.tedusar.classes.WeatherClass;
+import ru.tedusar.entity.WeatherClass;
 import ru.tedusar.utils.DBConnector;
 
 import java.sql.*;
@@ -8,9 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WeatherRepository {
+    private static final String SAVE_SQL = "INSERT INTO forecast (id_city, temp, wind_speed, wind_direction, pressure, humidity, uvIndex, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String FIND_LATEST_BY_CITY_ID_SQL = "SELECT * FROM forecast WHERE id_city = ? ORDER BY timestamp DESC LIMIT 1";
+    private static final String FIND_FORECAST_HISTORY_SQL = "SELECT * FROM forecast WHERE id_city = ? ORDER BY timestamp DESC";
+    private static final String FIND_BY_ID_SQL = "SELECT * FROM forecast WHERE id_forecast = ?";
+
     public void save(WeatherClass weather) throws SQLException {
-        String sql = "INSERT INTO forecast (id_city, temp, wind_speed, wind_direction, " +
-                "pressure, humidity, uvIndex, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = SAVE_SQL;
 
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -35,7 +39,7 @@ public class WeatherRepository {
     }
 
     public WeatherClass findLatestByCityId(int cityId) throws SQLException {
-        String sql = "SELECT * FROM forecast WHERE id_city = ? ORDER BY timestamp DESC LIMIT 1";
+        String sql = FIND_LATEST_BY_CITY_ID_SQL;
 
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -64,7 +68,7 @@ public class WeatherRepository {
 
     public List<WeatherClass> findForecastHistory(int cityId) throws SQLException {
         List<WeatherClass> forecasts = new ArrayList<>();
-        String sql = "SELECT * FROM forecast WHERE id_city = ? ORDER BY timestamp DESC";
+        String sql = FIND_FORECAST_HISTORY_SQL;
 
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -91,7 +95,7 @@ public class WeatherRepository {
     }
 
     public WeatherClass findById(int forecastId) throws SQLException {
-        String sql = "SELECT * FROM forecast WHERE id_forecast = ?";
+        String sql = FIND_BY_ID_SQL;
 
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

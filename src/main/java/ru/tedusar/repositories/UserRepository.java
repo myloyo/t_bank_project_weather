@@ -1,6 +1,6 @@
 package ru.tedusar.repositories;
 
-import ru.tedusar.classes.UserClass;
+import ru.tedusar.entity.UserClass;
 import java.sql.SQLException;
 
 public interface UserRepository {
