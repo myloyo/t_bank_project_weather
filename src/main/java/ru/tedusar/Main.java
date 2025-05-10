@@ -1,64 +1,89 @@
 package ru.tedusar;
 
-import ru.tedusar.classes.HistoryClass;
+import ru.tedusar.entity.*;
 import ru.tedusar.exceptions.*;
+import ru.tedusar.repositories.*;
 import ru.tedusar.services.*;
+import ru.tedusar.utils.DBInitialize;
 
+import java.sql.SQLException;
 import java.util.*;
 
+
 public class Main {
+    private static final String LATIN_LETTERS_PATTERN = ".*[A-Za-z].*";
+    private static final String DIGITS_OR_INVALID_CHARS_PATTERN = ".*\\d.*|.*[^а-яА-Я\\s\\-].*";
+
     public static void main(String[] args) {
-        HistoryService historyService = new HistoryService("history.txt");
-        List<HistoryClass> history = historyService.loadHistory();
-
-        CityService repo = new CityService();
-        WeatherService weather = new WeatherService(repo);
-        weather.initializeWeatherData();
-
-        Scanner in = new Scanner(System.in);
-        System.out.print("Введите город: ");
-        String city = in.nextLine().trim();
-
         try {
-            if (city.isEmpty()) {
-                throw new BlankLineError("Введено пустое значение");
-            }
-            if (city.matches(".*[A-Za-z].*")) {
-                throw new UncorrectNaming("Латинские буквы в названии: " + city);
-            }
-            if (city.matches(".*\\d.*") || city.matches(".*[^а-яА-Я\\s\\-].*")) {
-                throw new InvalidSymbols("Название содержит недопустимые символы: " + city);
-            }
-            if (!repo.containsCity(city)) {
-                throw new UncorrectTown("Некорректное название города: " + city);
+            DBInitialize.initialize();
+
+            CitiesRepository citiesRepo = new CitiesRepository();
+            WeatherRepository weatherRepo = new WeatherRepository();
+            HistoryRepository historyRepo = new HistoryRepository();
+
+            CityService cityService = new CityService(citiesRepo, weatherRepo);
+            WeatherService weatherService = new WeatherService(citiesRepo, weatherRepo);
+            HistoryService historyService = new HistoryService(historyRepo);
+
+            cityService.initializeDefaultCities();
+            weatherService.updateWeatherForAllCities();
+
+            Scanner in = new Scanner(System.in);
+            System.out.print("Введите город: ");
+            String cityName = in.nextLine().trim();
+
+            try {
+                validateCityInput(cityName);
+                if (!cityService.cityExists(cityName)) {
+                    throw new UncorrectTown("Некорректное название города: " + cityName);
+                }
+
+                CityClass city = cityService.getCityWithWeather(cityName);
+                System.out.println("Прогноз погоды для города " + cityName + ":");
+                System.out.println(city.getWeather());
+
+                WeatherClass weather = city.getWeather();
+                historyService.saveRequest(weather.getIdForecast(), 1);
+
+                System.out.println("\nИстория запросов:");
+                List<HistoryClass> history = historyService.getUserHistory(1);
+                for (HistoryClass entry : history) {
+                    WeatherClass histWeather = weatherRepo.findById(entry.getIdForecast());
+                    CityClass histCity = citiesRepo.findById(histWeather.getCityId());
+                    System.out.println("Город: " + histCity.getName());
+                    System.out.println(histWeather);
+                    System.out.println();
+                }
+
+                System.out.println("Очистить историю поиска? (да/нет)");
+                String input = in.nextLine();
+                if (input.equalsIgnoreCase("да")) {
+                    historyService.clearUserHistory(1);
+                    System.out.println("История успешно очищена");
+                }
+
+            } catch (UncorrectTown | UncorrectNaming | BlankLineError | InvalidSymbols e) {
+                System.out.println(e.getMessage());
+            } finally {
+                in.close();
             }
 
-            System.out.println("Прогноз погоды для города " + city + ":");
-            String weatherInfo = repo.getCity(city).toString();
-            System.out.println(weatherInfo);
+        } catch (SQLException e) {
+            System.err.println("Ошибка работы с БД: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
-            history.add(new HistoryClass(city, weatherInfo));
-
-            System.out.print("\nВы также уже искали: \n");
-            for (HistoryClass info : history) {
-                System.out.println("Город: " + info.getCityName());
-                System.out.println(info.getWeatherInfo());
-                System.out.println();
-            }
-
-            System.out.println("Очистить историю поиска? (да/нет)");
-            String input = in.next();
-            if (input.equalsIgnoreCase("да")) {
-                history.clear();
-                historyService.clear();
-                System.out.println("История успешно очищена");
-            }
-
-        } catch (UncorrectTown | UncorrectNaming | BlankLineError | InvalidSymbols e) {
-            System.out.println(e.getMessage());
-        } finally {
-            historyService.saveHistory(history);
-            in.close();
+    private static void validateCityInput(String city) throws BlankLineError, UncorrectNaming, InvalidSymbols {
+        if (city.isEmpty()) {
+            throw new BlankLineError("Введено пустое значение");
+        }
+        if (city.matches(LATIN_LETTERS_PATTERN)) {
+            throw new UncorrectNaming("Латинские буквы в названии: " + city);
+        }
+        if (city.matches(DIGITS_OR_INVALID_CHARS_PATTERN)) {
+            throw new InvalidSymbols("Название содержит недопустимые символы: " + city);
         }
     }
 }
