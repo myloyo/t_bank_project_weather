@@ -9,9 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 @Service
 public class GeocodingServiceImpl {
     private final String apiKey;
@@ -26,8 +23,8 @@ public class GeocodingServiceImpl {
     }
 
     public City geocodeCity(String cityName) throws CityNotFoundException {
-        String requestUrl = String.format("%s?apikey=%s&geocode=%s&format=json", apiUrl, apiKey,
-                URLEncoder.encode(cityName, StandardCharsets.UTF_8));
+        String requestUrl = String.format("%s?apikey=%s&geocode=%s&lang=ru_RU&results=1&format=json", apiUrl, apiKey,
+                cityName);
         ResponseEntity<String> response = restTemplate.getForEntity(requestUrl, String.class);
 
         try {

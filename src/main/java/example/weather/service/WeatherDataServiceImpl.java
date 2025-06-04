@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class WeatherDataServiceImpl {
@@ -21,8 +22,13 @@ public class WeatherDataServiceImpl {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public Weather getWeatherData(double latitude, double longitude) throws WeatherServiceException {
-        String url = String.format("https://projecteol.ru/api/weather?lat=%.6f&lon=%.6f", latitude, longitude);
+    public Weather getWeatherData(double latitude, double longitude, LocalDateTime date)
+            throws WeatherServiceException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:00");
+        String dateStr = date.format(formatter);
+        String url = String.format(java.util.Locale.US,
+                "https://projecteol.ru/api/weather?lat=%.6f&lon=%.6f&date=%s&token=%s",
+                latitude, longitude, dateStr, apiKey);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + apiKey);
@@ -33,13 +39,18 @@ public class WeatherDataServiceImpl {
             JsonNode body = response.getBody();
 
             Weather weather = new Weather();
-            weather.setTemperature(body.get("temperature").asInt());
-            weather.setWindSpeed(body.get("wind_speed").asInt());
-            weather.setWindDirection(body.get("wind_direction").asText());
-            weather.setPressure(body.get("pressure").asInt());
-            weather.setHumidity(body.get("humidity").asInt());
-            weather.setUvIndex(body.get("uv_index").asInt());
-            weather.setTimestamp(LocalDateTime.now());
+            if (body.isArray() && body.size() > 0) {
+                JsonNode first = body.get(0);
+                weather.setTimestamp(LocalDateTime.parse(first.get("dt_forecast").asText()));
+                weather.setTemperature((int) Math.round(first.get("temp_2_cel").asDouble()));
+                weather.setWindSpeed((int) Math.round(first.get("wind_speed_100").asDouble()));
+                weather.setWindDirection(String.valueOf(first.get("wind_dir_100").asDouble()));
+                weather.setPressure((int) Math.round(first.get("pres_surf").asDouble() / 100.0));
+                weather.setHumidity((int) Math.round(first.get("vlaga_2").asDouble()));
+                weather.setUvIndex(first.get("uv_index").asInt());
+            } else {
+                throw new WeatherServiceException("Пустой ответ от EOL API");
+            }
             return weather;
 
         } catch (Exception e) {

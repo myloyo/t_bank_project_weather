@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/weather_db?currentSchema=weather
+    url: jdbc:postgresql://localhost:5433/weather_db
     username: weather_user
     password: weather_pass
     driver-class-name: org.postgresql.Driver
@@ -27,5 +27,5 @@ logging:
     com.example.weather: TRACE
 
 jwt:
-  secret: mySuperSecretKeyForJWT
+  secret: doufgvabhrpifvaouwesvbcihsabciabewoufeuciydfisgcbljkzXNmsaoPeivfouwgfiyhaosjoskcmsoPHBSCSSBIidzygvgaefwyiOISCB
   expiration: 3600000 # 1 час

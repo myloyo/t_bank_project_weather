@@ -16,9 +16,11 @@ public class CityService {
     private static final String DIGITS_OR_INVALID_CHARS_PATTERN = ".*\\d.*|.*[^а-яА-Я\\s\\-].*";
 
     private final CityRepository cityRepository;
+    private final GeocodingServiceImpl geocodingService;
 
-    public CityService(CityRepository cityRepository) {
+    public CityService(CityRepository cityRepository, GeocodingServiceImpl geocodingService) {
         this.cityRepository = cityRepository;
+        this.geocodingService = geocodingService;
     }
 
     public void validateCityInput(String city) throws BlankLineError, UncorrectNaming, InvalidSymbols {
@@ -36,6 +38,9 @@ public class CityService {
     public City getCity(String cityName) throws BlankLineError, InvalidSymbols, UncorrectNaming, CityNotFoundException {
         validateCityInput(cityName);
         Optional<City> city = cityRepository.findByName(cityName);
-        return city.orElseThrow(() -> new CityNotFoundException("Город не найден: " + cityName));
+        if (city.isPresent()) {
+            return city.get();
+        }
+        return cityRepository.save(geocodingService.geocodeCity(cityName));
     }
 }

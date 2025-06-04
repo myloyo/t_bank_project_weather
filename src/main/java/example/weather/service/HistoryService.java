@@ -64,13 +64,13 @@ public class HistoryService {
 
         HistoryResponse response = new HistoryResponse();
         response.setRequestTime(DateUtils.toUserFriendlyFormat(history.getRequestTime()));
-        response.setCity(cityName);
-        response.setWeather(convertToWeatherResponse(weather));
+        response.setWeather(convertToWeatherResponse(weather, cityName));
         return response;
     }
 
-    private WeatherResponse convertToWeatherResponse(Weather weather) {
+    private WeatherResponse convertToWeatherResponse(Weather weather, String city) {
         WeatherResponse response = new WeatherResponse();
+        response.setCity(city);
         response.setTemperature(weather.getTemperature());
         response.setWindSpeed(weather.getWindSpeed());
         response.setWindDirection(weather.getWindDirection());

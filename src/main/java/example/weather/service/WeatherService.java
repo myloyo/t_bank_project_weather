@@ -6,8 +6,8 @@ import example.weather.model.dto.WeatherResponse;
 import example.weather.model.entity.City;
 import example.weather.model.entity.Weather;
 import example.weather.repository.WeatherRepository;
-import example.weather.service.GeocodingServiceImpl;
-import example.weather.service.WeatherDataServiceImpl;
+
+import java.time.LocalDateTime;
 
 @Service
 public class WeatherService {
@@ -36,10 +36,11 @@ public class WeatherService {
 
         Weather weather = weatherDataService.getWeatherData(
                 city.getLatitude(),
-                city.getLongitude());
+                city.getLongitude(),
+                LocalDateTime.now());
 
         weather.setCityId(city.getId());
-        weatherRepository.save(weather);
+        weather = weatherRepository.save(weather);
 
         if (userId != null) {
             historyService.saveRequest(weather.getId(), userId);
@@ -48,9 +49,9 @@ public class WeatherService {
         return mapToResponse(city, weather);
     }
 
-    public WeatherResponse getWeatherByCoords(double lat, double lon, Long userId) {
+    public WeatherResponse getWeatherByCoords(double lat, double lon, LocalDateTime date, Long userId) {
         try {
-            Weather weather = weatherDataService.getWeatherData(lat, lon);
+            Weather weather = weatherRepository.save(weatherDataService.getWeatherData(lat, lon, date));
             WeatherResponse response = new WeatherResponse();
             response.setCity(null);
             response.setTemperature(weather.getTemperature());

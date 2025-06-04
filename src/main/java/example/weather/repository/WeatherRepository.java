@@ -3,12 +3,15 @@ package example.weather.repository;
 import example.weather.model.entity.Weather;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.sql.Statement;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -19,18 +22,31 @@ public class WeatherRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void save(Weather weather) {
-        String sql = "INSERT INTO forecast (id_city, temp, wind_speed, wind_direction, pressure, humidity, uvIndex, timestamp) " +
+    public Weather save(Weather weather) {
+        String sql = "INSERT INTO forecast (id_city, temp, wind_speed, wind_direction, pressure, humidity, uvIndex, timestamp) "
+                +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql,
-                weather.getCityId(),
-                weather.getTemperature(),
-                weather.getWindSpeed(),
-                weather.getWindDirection(),
-                weather.getPressure(),
-                weather.getHumidity(),
-                weather.getUvIndex(),
-                Timestamp.valueOf(weather.getTimestamp()));
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setObject(1, weather.getCityId(), java.sql.Types.BIGINT);
+            ps.setObject(2, weather.getTemperature(), java.sql.Types.INTEGER);
+            ps.setObject(3, weather.getWindSpeed(), java.sql.Types.INTEGER);
+            ps.setString(4, weather.getWindDirection());
+            ps.setObject(5, weather.getPressure(), java.sql.Types.INTEGER);
+            ps.setObject(6, weather.getHumidity(), java.sql.Types.INTEGER);
+            ps.setObject(7, weather.getUvIndex(), java.sql.Types.INTEGER);
+            ps.setObject(8, weather.getTimestamp() != null ? java.sql.Timestamp.valueOf(weather.getTimestamp()) : null,
+                    java.sql.Types.TIMESTAMP);
+            return ps;
+        }, keyHolder);
+
+        Map<String, Object> keys = keyHolder.getKeys();
+        if (keys != null && keys.get("id_forecast") != null) {
+            weather.setId(((Number) keys.get("id_forecast")).longValue());
+        }
+        return weather;
     }
 
     public Optional<Weather> findById(Long id) {
