@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/weather_db
+    username: weather_user
+    password: weather_pass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+eol:
+  weather:
+    api-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4OTc0NzM0LCJpYXQiOjE3NDg5NzQ0MzQsImp0aSI6ImMyZmI2MTllOWI0YTQ0ZmQ4OWE5MWU5YWI0ZDk4YzVlIiwidXNlcl9pZCI6MTExMX0.N4BxNRWu_wMnFz61TNLdNSE76H_o7SuP7poF-97H-ZE
+
+yandex:
+  geocoder:
+    api-key: 8bbed3cd-2818-42f5-b78b-41b0dbd3eaec
+    url: https://geocode-maps.yandex.ru/1.x
+
+logging:
+  level:
+    org.springframework: TRACE
+    com.example.weather: TRACE
+
+jwt:
+  secret: doufgvabhrpifvaouwesvbcihsabciabewoufeuciydfisgcbljkzXNmsaoPeivfouwgfiyhaosjoskcmsoPHBSCSSBIidzygvgaefwyiOISCB
+  expiration: 3600000 # 1 час
