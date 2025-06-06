@@ -48,4 +48,22 @@ public class GeocodingServiceImpl {
             throw new CityNotFoundException("Ошибка при получении координат города: " + cityName);
         }
     }
+
+    public String reverseGeocode(double lat, double lon) {
+        String requestUrl = String.format("%s?apikey=%s&geocode=%f,%f&lang=ru_RU&results=1&format=json", apiUrl, apiKey,
+                lon, lat);
+        ResponseEntity<String> response = restTemplate.getForEntity(requestUrl, String.class);
+        try {
+            JSONObject json = new JSONObject(response.getBody());
+            JSONArray featureMembers = json.getJSONObject("response")
+                    .getJSONObject("GeoObjectCollection")
+                    .getJSONArray("featureMember");
+            if (featureMembers.length() == 0)
+                return "";
+            JSONObject geoObject = featureMembers.getJSONObject(0).getJSONObject("GeoObject");
+            return geoObject.getString("name");
+        } catch (Exception e) {
+            return "";
+        }
+    }
 }

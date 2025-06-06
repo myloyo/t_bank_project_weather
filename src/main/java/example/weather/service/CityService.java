@@ -43,4 +43,19 @@ public class CityService {
         }
         return cityRepository.save(geocodingService.geocodeCity(cityName));
     }
+
+    public Optional<City> findByCoords(double lat, double lon) {
+        Optional<City> cityOpt = cityRepository.findByCoordsApprox(lat, lon);
+        if (cityOpt.isPresent()) {
+            return cityOpt;
+        } else {
+            // Если не найден, определяем имя через обратное геокодирование
+            String cityName = geocodingService.reverseGeocode(lat, lon);
+            City city = new City();
+            city.setName(cityName);
+            city.setLatitude(lat);
+            city.setLongitude(lon);
+            return Optional.of(cityRepository.save(city));
+        }
+    }
 }
