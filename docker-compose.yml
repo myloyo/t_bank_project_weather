@@ -13,6 +13,21 @@ services:
     networks:
       - app-network
 
+  app:
+    build: .
+    container_name: weather_app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://weather_db:5432/weather_db
+      SPRING_DATASOURCE_USERNAME: weather_user
+      SPRING_DATASOURCE_PASSWORD: weather_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
 volumes:
   postgres-data:
 
